@@ -135,6 +135,9 @@ base_style = {
         "align_items": "stretch",
         "justify_content": "space-between",
     },
+    ".almost_hidden": {
+        "opacity": 0,
+    }
 }
 
 markdown_style = {
