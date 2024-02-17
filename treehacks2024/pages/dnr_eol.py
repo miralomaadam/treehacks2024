@@ -80,7 +80,7 @@ def dnr_eol() -> rx.Component:
                 form,
                 spacing="4",
                 align="center",
-                style={"bg": "#ededed", "overflow": "auto"}
+                style={"bg": "#ADD8E6", "overflow": "auto"}
             ),
             align_items="center"
         )
