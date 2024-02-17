@@ -4,6 +4,10 @@ from .login import require_login
 @rx.page(route="/view_dnr", title="View DNR + EOL Answers", image="/github.svg")
 @require_login
 def view_dnr() -> rx.Component:
+
+    def go_home() -> rx.event.EventSpec:
+        return rx.redirect('/')
+
     def on_submit() -> rx.event.EventSpec:
         # save data to a database later
         return rx.redirect('/view_dnr')
@@ -47,8 +51,11 @@ def view_dnr() -> rx.Component:
         rx.button("Submit", type="submit", margin_top="20px", on_click=on_submit)
     )
 
+    home_button = rx.button("Home", on_click=go_home)
+
     return rx.fragment(
         rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
+        home_button,
         rx.vstack(
             rx.heading("View DNR + EOL Answers", font_size="2em"),
             form,
