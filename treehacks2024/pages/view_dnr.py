@@ -14,7 +14,7 @@ def view_dnr() -> rx.Component:
     def question_input(label: str, id: str) -> rx.Component:
         return rx.fragment(
             rx.text(label, margin_top="4px", margin_bottom="2px"),
-            rx.textarea(id=id, placeholder="Type your answer here", rows=3)
+            rx.input(id=id, placeholder="Type your answer here")
         )
 
     # List of questions
