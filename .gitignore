@@ -5,3 +5,5 @@
 .ini
 __pycache__/
 alembic/
+alembic.ini
+*.sh

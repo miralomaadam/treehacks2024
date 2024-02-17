@@ -18,20 +18,21 @@ class RegistrationState(State):
 
     success: bool = False
     error_message: str = ""
+    _state_name: str = ""
 
     async def handle_registration(
         self, form_data
     ) -> AsyncGenerator[rx.event.EventSpec | list[rx.event.EventSpec] | None, None]:
         """Handle registration form on_submit.
-
+        
         Set error_message appropriately based on validation results.
 
         Args:
             form_data: A dict of form fields and values.
         """
+        print(form_data)
         with rx.session() as session:
-            state_name = form_data["state_name"]
-            if not state_name:
+            if not self._state_name:
                 self.error_message = "State name cannot be empty"
                 yield rx.set_focus("state_name")
                 return
@@ -65,7 +66,7 @@ class RegistrationState(State):
             new_user = User()  # type: ignore
             new_user.username = username
             new_user.password_hash = User.hash_password(password)
-            new_user.state_name = state_name
+            new_user.state_name = self._state_name
             new_user.enabled = True
             session.add(new_user)
             session.commit()
@@ -75,6 +76,10 @@ class RegistrationState(State):
         yield
         await asyncio.sleep(0.5)
         yield [rx.redirect(LOGIN_ROUTE), RegistrationState.set_success(False)]
+    
+    def update_state_name(self, state_name: str) -> None:
+        """Update the state name in the state."""
+        self._state_name = state_name
 
 
 @rx.page(route=REGISTER_ROUTE)
@@ -134,11 +139,25 @@ def registration() -> rx.Component:
                         margin_top="2px",
                         margin_bottom="4px",
                     ),
-                    rx.input(
-                        placeholder="State name",
+                    rx.select(
+                        items=[
+                            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
+                            "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
+                            "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska",
+                            "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+                            "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas",
+                            "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", "District of Columbia",
+                            "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "United States Minor Outlying Islands",
+                            "Virgin Islands, U.S."
+                        ],
+                        placeholder="Select a state name",
+                        label="State name",
+                        required=True,
                         id="state_name",
                         border_color="hsl(240,3.7%,15.9%)",
                         justify_content="center",
+                        name="state_name",
+                        on_change=lambda value: RegistrationState.update_state_name(value),
                     ),
                     rx.box(
                         rx.button(
