@@ -1,0 +1,6 @@
+*.db
+*.py[cod]
+.web
+.db
+.ini
+__pycache__/
