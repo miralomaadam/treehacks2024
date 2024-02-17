@@ -22,13 +22,13 @@ def view_dnr() -> rx.Component:
 
     def question_input(label: str, id: str) -> rx.Component:
         return rx.fragment(
-            rx.text(label, margin_top="4px", margin_bottom="2px"),
+            rx.text(label, margin_top="2px", margin_bottom="2px"),
             rx.input(id=id, placeholder="Type your answer here")
         )
     
     def question_input(label: str, id: str) -> rx.Component:
         return rx.fragment(
-            rx.text(label, margin_top="4px", margin_bottom="2px"),
+            rx.text(label, margin_top="2px", margin_bottom="2px"),
             rx.input(id=id, placeholder="Type your answer here"),
             style=question_style
         )
@@ -78,13 +78,9 @@ def view_dnr() -> rx.Component:
                 rx.heading("View DNR + EOL Answers", font_size="2em"),
                 form,
                 spacing="4",
-                padding_top="1%",
                 align="center",
-                padding="60px",
                 style={"bg": "#ededed", "overflow": "auto"}
             ),
-            padding_y="2em",
-            height="100vh",
             align_items="top"
         )
     )
