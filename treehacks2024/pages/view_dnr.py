@@ -5,9 +5,9 @@ from .login import require_login
 @require_login
 def view_dnr() -> rx.Component:
     # Function to handle form submission
-    def on_submit(event: rx.event.FormEvent) -> None:
-        form_data = event.value
-        #add logic later to send data to database
+    def on_submit(form_data: dict) -> None:
+        # Logic to handle form data goes here
+        # For example, save the data to a database
         print(form_data)
 
     # Create input fields for each question
@@ -32,7 +32,7 @@ def view_dnr() -> rx.Component:
             spacing="6"
         ),
         rx.button("Submit", type="submit", margin_top="20px"),
-        on_submit=on_submit
+        on_submit=lambda event: on_submit(event.value)
     )
 
     # Layout the page
