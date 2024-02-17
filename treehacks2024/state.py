@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from sqlmodel import select
 
@@ -12,9 +13,87 @@ AUTH_TOKEN_LOCAL_STORAGE_KEY = "_auth_tokens"
 DEFAULT_AUTH_SESSION_EXPIRATION_DELTA = datetime.timedelta(days=7)
 
 
+class QA(rx.Base):
+    """A question and answer pair."""
+
+    question: str
+    answer: str
+
+
 class State(rx.State):
     # The auth_token is stored in local storage to persist across tab and browser sessions.
     auth_token: str = rx.LocalStorage(name=AUTH_TOKEN_LOCAL_STORAGE_KEY)
+
+    # The current question.
+    question: str
+
+    chat: list[QA]
+
+    # Whether we are processing the question.
+    processing: bool = False
+
+    # Whether the modal is open.
+    modal_open: bool = False
+
+    def reset_chat(self):
+        """Create a new chat."""
+        self.chat = []
+
+    async def process_question(self, form_data: dict[str, str]):
+        # Get the question from the form
+        question = form_data["question"]
+
+        # Check if the question is empty
+        if question == "":
+            return
+
+        async for value in self.openai_process_question(question):
+            yield value
+
+    async def openai_process_question(self, question: str):
+        """Get the response from the API.
+
+        Args:
+            form_data: A dict with the current question.
+        """
+        # Add the question to the list of questions.
+        qa = QA(question=question, answer="")
+        self.chat.append(qa)
+
+        # Clear the input and start the processing.
+        self.processing = True
+        yield
+
+        # Build the messages.
+        messages = [
+            {"role": "system", "content": "You are a friendly chatbot named Reflex."}
+        ]
+        for qa in self.chat:
+            messages.append({"role": "user", "content": qa.question})
+            messages.append({"role": "assistant", "content": qa.answer})
+
+        # Remove the last mock answer.
+        messages = messages[:-1]
+
+        """
+        # Start a new session to answer the question.
+        session = openai.ChatCompletion.create(
+            model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+            messages=messages,
+            stream=True,
+        )
+
+        # Stream the results, yielding after every word.
+        for item in session:
+            if hasattr(item.choices[0].delta, "content"):
+                answer_text = item.choices[0].delta.content
+                self.chats[self.current_chat][-1].answer += answer_text
+                self.chats = self.chats
+                yield
+
+        # Toggle the processing flag.
+        self.processing = False
+        """
 
     @rx.cached_var
     def authenticated_user(self) -> User:

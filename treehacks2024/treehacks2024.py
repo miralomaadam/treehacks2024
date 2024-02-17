@@ -1,6 +1,7 @@
 import reflex as rx
 
 from .pages import index
+from .styles import base_style
 
-app = rx.App(style={"font_size": "40px", rx.button: {"font_size": "40px", "padding": "50px 50px"}})
+app = rx.App(style=base_style)
 app.add_page(index)
