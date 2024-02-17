@@ -5,8 +5,8 @@ from .login import require_login
 question_style = {
     "bg": "white",
     "padding": "2em",
-    "border_radius": "250px",
-    "width": "100%",
+    "border_radius": "100px",
+    "width": "60%",
     "align_items": "start",
 }
 
