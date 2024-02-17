@@ -30,6 +30,11 @@ class RegistrationState(State):
             form_data: A dict of form fields and values.
         """
         with rx.session() as session:
+            state_name = form_data["state_name"]
+            if not state_name:
+                self.error_message = "State name cannot be empty"
+                yield rx.set_focus("state_name")
+                return
             username = form_data["username"]
             if not username:
                 self.error_message = "Username cannot be empty"
@@ -60,6 +65,7 @@ class RegistrationState(State):
             new_user = User()  # type: ignore
             new_user.username = username
             new_user.password_hash = User.hash_password(password)
+            new_user.state_name = state_name
             new_user.enabled = True
             session.add(new_user)
             session.commit()
@@ -121,6 +127,18 @@ def registration() -> rx.Component:
                         border_color="hsl(240,3.7%,15.9%)",
                         justify_content="center",
                         type="password",
+                    ),
+                    rx.text(
+                        "State of residence",
+                        color="hsl(240, 5%, 64.9%)",
+                        margin_top="2px",
+                        margin_bottom="4px",
+                    ),
+                    rx.input(
+                        placeholder="State name",
+                        id="state_name",
+                        border_color="hsl(240,3.7%,15.9%)",
+                        justify_content="center",
                     ),
                     rx.box(
                         rx.button(

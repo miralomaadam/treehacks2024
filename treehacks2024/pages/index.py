@@ -1,18 +1,33 @@
 """The home page of the app."""
 
 from treehacks2024 import styles
-from treehacks2024.templates import template
 
 import reflex as rx
 
+from .login import require_login
 
-@template(route="/", title="Home", image="/github.svg")
+
+@rx.page(route="/", title="Home", image="/github.svg")
+@require_login
 def index() -> rx.Component:
-    """The home page.
+    """Render the index page.
 
     Returns:
-        The UI for the home page.
+        A reflex component.
     """
-    with open("README.md", encoding="utf-8") as readme:
-        content = readme.read()
-    return rx.markdown(content, component_map=styles.markdown_style)
+    return rx.fragment(
+        rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
+        rx.vstack(
+            rx.heading("Welcome!", font_size="2em"),
+            rx.spacer(),
+            rx.link(rx.button("Schedule DNR appointment"), href="/schedule", high_contrast=True),
+            rx.link(rx.button("Sign DNR + Answer EOL Questions"), href="/dnr_eol", high_contrast=True),
+            rx.link(rx.button("View DNR"), href="/view_dnr", high_contrast=True),
+            rx.link(rx.button("Find OT interventions"), href="/ot", high_contrast=True),
+            rx.link(rx.button("Will"), href="/will", high_contrast=True),
+            rx.button("Logout", on_click=rx.redirect("/logout"), float="right", size="4", high_contrast=True),
+            spacing="4",
+            padding_top="10%",
+            align="center",
+        ),
+    )

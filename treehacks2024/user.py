@@ -11,7 +11,7 @@ class User(
     table=True,  # type: ignore
 ):
     """A local User model with bcrypt password hashing."""
-
+    state_name: str = Field(nullable=False)
     username: str = Field(unique=True, nullable=False, index=True)
     password_hash: str = Field(nullable=False)
     enabled: bool = False

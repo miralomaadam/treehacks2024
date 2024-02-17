@@ -29,6 +29,13 @@ link_style = {
     **hover_accent_color,
 }
 
+button_style = {
+    "color": text_color,
+    "text_decoration": "none",
+    "font-size": "25px",
+    **hover_accent_color,
+}
+
 overlapping_button_style = {
     "background_color": "white",
     "border": border,
