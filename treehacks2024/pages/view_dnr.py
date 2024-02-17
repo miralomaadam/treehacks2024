@@ -1,6 +1,14 @@
 import reflex as rx
 from .login import require_login
 
+question_style = {
+    "bg": "white",
+    "padding": "2em",
+    "border_radius": "25px",
+    "width": "100%",
+    "align_items": "start",
+}
+
 @rx.page(route="/view_dnr", title="View DNR + EOL Answers", image="/github.svg")
 @require_login
 def view_dnr() -> rx.Component:
@@ -16,6 +24,13 @@ def view_dnr() -> rx.Component:
         return rx.fragment(
             rx.text(label, margin_top="4px", margin_bottom="2px"),
             rx.input(id=id, placeholder="Type your answer here")
+        )
+    
+    def question_input(label: str, id: str) -> rx.Component:
+        return rx.fragment(
+            rx.text(label, margin_top="4px", margin_bottom="2px"),
+            rx.input(id=id, placeholder="Type your answer here"),
+            style=question_style
         )
 
     questions = [
@@ -48,7 +63,9 @@ def view_dnr() -> rx.Component:
             *(question_input(question, f"question{i}") for i, question in enumerate(questions)),
             spacing="6"
         ),
-        rx.button("Submit", type="submit", margin_top="20px", on_click=on_submit)
+        rx.button("Submit", type="submit", margin_top="20px", on_click=on_submit, 
+                color="white", width="6em", padding="1em"),
+        style=question_style
     )
 
     home_button = rx.button("Home", on_click=go_home)
@@ -56,12 +73,18 @@ def view_dnr() -> rx.Component:
     return rx.fragment(
         rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
         home_button,
-        rx.vstack(
-            rx.heading("View DNR + EOL Answers", font_size="2em"),
-            form,
-            spacing="4",
-            padding_top="10%",
-            align="center",
-            padding="60px"
+        rx.center(
+            rx.vstack(
+                rx.heading("View DNR + EOL Answers", font_size="2em"),
+                form,
+                spacing="4",
+                padding_top="10%",
+                align="center",
+                padding="60px",
+                style={"bg": "#ededed", "overflow": "auto"}
+            ),
+            padding_y="2em",
+            height="100vh",
+            align_items="top"
         )
     )
