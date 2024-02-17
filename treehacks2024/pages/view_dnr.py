@@ -78,7 +78,7 @@ def view_dnr() -> rx.Component:
                 rx.heading("View DNR + EOL Answers", font_size="2em"),
                 form,
                 spacing="4",
-                padding_top="10%",
+                padding_top="1%",
                 align="center",
                 padding="60px",
                 style={"bg": "#ededed", "overflow": "auto"}
