@@ -5,10 +5,12 @@ from .login import require_login
 @require_login
 def view_dnr() -> rx.Component:
     # Function to handle form submission
-    def on_submit(form_data: dict) -> None:
+    def on_submit() -> None:
+        # Access form data using rx.get_value for each input field
+        answers = {f"question{i}": rx.get_value(f"question{i}") for i in range(len(questions))}
         # Logic to handle form data goes here
         # For example, save the data to a database
-        print(form_data)
+        print(answers)
 
     # Create input fields for each question
     def question_input(label: str, id: str) -> rx.Component:
@@ -32,7 +34,7 @@ def view_dnr() -> rx.Component:
             spacing="6"
         ),
         rx.button("Submit", type="submit", margin_top="20px"),
-        on_submit=lambda event: on_submit(event.value)
+        on_submit=on_submit
     )
 
     # Layout the page
