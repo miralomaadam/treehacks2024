@@ -81,6 +81,6 @@ def view_dnr() -> rx.Component:
                 align="center",
                 style={"bg": "#ededed", "overflow": "auto"}
             ),
-            align_items="top"
+            align_items="center"
         )
     )
