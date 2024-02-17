@@ -75,7 +75,7 @@ def view_dnr() -> rx.Component:
         home_button,
         rx.center(
             rx.vstack(
-                rx.heading("View DNR + EOL Answers", font_size="2em"),
+                rx.heading("View DNR + EOL Answers", font_size="1em"),
                 form,
                 spacing="4",
                 align="center",
