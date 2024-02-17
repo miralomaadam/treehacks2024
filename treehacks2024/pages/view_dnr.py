@@ -55,6 +55,6 @@ def view_dnr() -> rx.Component:
             spacing="4",
             padding_top="10%",
             align="center",
-            padding="20px"
+            padding="60px"
         )
     )
