@@ -5,9 +5,11 @@ from .login import require_login
 @require_login
 def view_dnr() -> rx.Component:
     # Function to handle form submission
-    # Please replace this with the appropriate Reflex method for handling form submission
-    def on_submit():
-        pass  # Implement submission logic as per Reflex documentation
+    def on_submit() -> rx.event.EventSpec:
+        # Implement submission logic as per Reflex documentation
+        # Example: Save form data, display a message, or redirect to another page
+        # For now, we'll just redirect to the same page as a placeholder
+        return rx.redirect('/view_dnr')
 
     # Create input fields for each question
     def question_input(label: str, id: str) -> rx.Component:
