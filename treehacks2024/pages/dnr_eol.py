@@ -10,7 +10,7 @@ question_style = {
     "align_items": "start",
 }
 
-@rx.page(route="/dnr_eol", title="Sign DNR + Answer EOL Questions", image="/github.svg")
+@rx.page(route="/dnr_eol", title="Questions & Answers About Preferred Medical Care ", image="/github.svg")
 @require_login
 def dnr_eol() -> rx.Component:
 
@@ -76,7 +76,7 @@ def dnr_eol() -> rx.Component:
         home_button,
         rx.center(
             rx.vstack(
-                rx.heading("View DNR + EOL Answers", font_size="0.75em"),
+                rx.heading("Questions & Answers About Preferred Medical Care", font_size="0.75em"),
                 form,
                 spacing="4",
                 align="center",

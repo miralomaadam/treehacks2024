@@ -21,7 +21,7 @@ def index() -> rx.Component:
             rx.heading("Welcome!", font_size="2em"),
             rx.spacer(),
             rx.link(rx.button("Schedule DNR appointment"), href="/schedule", high_contrast=True),
-            rx.link(rx.button("Sign DNR + Answer EOL Questions"), href="/dnr_eol", high_contrast=True),
+            rx.link(rx.button("Answer Questions About Yoru Preferred Medical Care"), href="/dnr_eol", high_contrast=True),
             rx.link(rx.button("View DNR"), href="/view_dnr", high_contrast=True),
             rx.link(rx.button("Find OT interventions"), href="/ot", high_contrast=True),
             rx.link(rx.button("Will"), href="/will", high_contrast=True),
