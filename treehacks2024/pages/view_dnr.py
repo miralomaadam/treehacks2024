@@ -1,10 +1,18 @@
 import reflex as rx
 from .login import require_login
 
+# Define a common style for the questions
+question_style = {
+    "bg": "white",
+    "padding": "2em",
+    "border_radius": "25px",
+    "width": "100%",
+    "align_items": "start",
+}
+
 @rx.page(route="/view_dnr", title="View DNR + EOL Answers", image="/github.svg")
 @require_login
 def view_dnr() -> rx.Component:
-
     def go_home() -> rx.event.EventSpec:
         return rx.redirect('/')
 
@@ -15,8 +23,10 @@ def view_dnr() -> rx.Component:
     def question_input(label: str, id: str) -> rx.Component:
         return rx.fragment(
             rx.text(label, margin_top="4px", margin_bottom="2px"),
-            rx.input(id=id, placeholder="Type your answer here")
+            rx.input(id=id, placeholder="Type your answer here"),
+            style=question_style
         )
+
 
     questions = [
         "Can you describe your understanding of your current health condition and how it might change in the future?",
@@ -48,20 +58,21 @@ def view_dnr() -> rx.Component:
             *(question_input(question, f"question{i}") for i, question in enumerate(questions)),
             spacing="6"
         ),
-        rx.button("Submit", type="submit", margin_top="20px", on_click=on_submit)
+        rx.button("Submit", type="submit", margin_top="20px", on_click=on_submit, bg="black", color="white")
     )
 
-    home_button = rx.button("Home", on_click=go_home)
+    home_button = rx.button("Home", on_click=go_home, bg="black", color="white", padding="1em")
 
-    return rx.fragment(
-        rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
-        home_button,
+    return rx.center(
         rx.vstack(
+            home_button,
             rx.heading("View DNR + EOL Answers", font_size="2em"),
             form,
             spacing="4",
-            padding_top="10%",
-            align="center",
-            padding="60px"
-        )
+        ),
+        padding_y="2em",
+        height="100vh",
+        align_items="top",
+        bg="#ededed",
+        overflow="auto",
     )
