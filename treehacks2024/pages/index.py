@@ -3,7 +3,6 @@ import reflex as rx
 from .login import require_login
 from ..state import State
 
-SIDEBAR_COLOR = "#FFFFFF" 
 
 @rx.page(route="/", title="Home", image="/github.svg")
 @require_login
@@ -25,7 +24,7 @@ def index() -> rx.Component:
         ),
         width="20%",
         padding="5%",
-        background_color=styles.SIDEBAR_COLOR,
+        background_color="#FFFFFF" ,
     )
 
     main_content = rx.chakra.box(
