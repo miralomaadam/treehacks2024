@@ -26,11 +26,13 @@ class WillPageState(rx.State):
 
     @rx.var
     def get_executor(self):
-        return self._executor
+        res = "Executor: " + self._executor
+        return res
     
     @rx.var
     def get_alternate_executor(self):
-        return self._alternate_executor
+        res = "Alternate Executor: " + self._alternate_executor
+        return res
     
     @rx.var
     def get_beneficiaries(self):
@@ -40,15 +42,25 @@ class WillPageState(rx.State):
         return res
     
     @rx.var
+    def get_beneficiaries_list(self) -> list[str]:
+        if not self._beneficiaries:
+            return []
+        return json.loads(self._beneficiaries)
+    
+    @rx.var
     def get_funeral_arrangements(self):
         return "Funeral Arrangements: " + self._funeral_arrangements
     
     @rx.var
     def get_assets(self):
-        res = "Assets: "
+        res = ""
         if self._assets:
-            res += ", ".join(json.loads(self._assets))
-        return res
+            assets_list = json.loads(self._assets)
+            for asset_info in assets_list:
+                asset_name = asset_info.get("name", "")
+                asset_beneficiary = asset_info.get("beneficiary", "")
+                res += f", {asset_name} (Beneficiary: {asset_beneficiary})"
+        return "Assets: " + res[1:] if res else "Assets:"
 
     @rx.var
     def get_residuary_beneficiary(self):
@@ -116,10 +128,12 @@ class WillPageState(rx.State):
 
     def handle_submit_executor(self, form_data: dict):
         executor = form_data["executor"]
-        self._executor = executor
         alternate_executor = form_data["alternate_executor"]
-        self._alternate_executor = alternate_executor
-        self._display_executor = f"Executor: {executor}, Alternate Executor: {alternate_executor}"
+        if executor:
+            self._executor = executor
+        if alternate_executor:
+            self._alternate_executor = alternate_executor
+        self._display_executor = f"Executor: {self._executor}, Alternate Executor: {self._alternate_executor}"
 
     def add_beneficiary(self, form_data: dict):
         # TODO: expand this to collect more information: residence, contanct info of beneficiary, maybe last 4 of SSN #
@@ -137,12 +151,14 @@ class WillPageState(rx.State):
         self._funeral_arrangements = funeral_arrangements
 
     def add_asset(self, form_data: dict):
-        # TODO: set asset beneficiary as well, maybe categorize asset type
-        asset = form_data["asset"]
-        if not asset:
+        asset_name = form_data["asset"]
+        asset_beneficiary = form_data["asset_beneficiary"]
+
+        if not asset_name or not asset_beneficiary:
             return
+
         assets = json.loads(self._assets) if self._assets else []
-        assets.append(asset)
+        assets.append({"name": asset_name, "beneficiary": asset_beneficiary})
         self._assets = json.dumps(assets)
     
     def set_residuary_beneficiary(self, form_data: dict):
@@ -177,8 +193,10 @@ class WillPageState(rx.State):
         assets_list = json.loads(self._assets) if self._assets else []
         if assets_list:
             will_template += "I distribute the following assets:\n"
-            for asset in assets_list:
-                will_template += f"- {asset}\n"
+            for asset_info in assets_list:
+                asset_name = asset_info.get("name", "")
+                asset_beneficiary = asset_info.get("beneficiary", "")
+                will_template += f"- {asset_name} to {asset_beneficiary}\n"
         else:
             will_template += "I have no specific assets listed for distribution.\n"
 
@@ -196,6 +214,7 @@ class WillPageState(rx.State):
         self._will_template = will_template
 
 
+
 @rx.page(title="Write Will", image="/github.svg")
 @require_login
 def will() -> rx.Component:
@@ -206,7 +225,7 @@ def will() -> rx.Component:
         rx.vstack(
             rx.heading("Write Your Will", font_size="2em"),
             rx.spacer(),
-            rx.heading("Step 1: Choose your executor", font_size="1.5em"),
+            rx.heading("Choose your executor", font_size="1.5em"),
             rx.text("Your executor is the person who will carry out your wishes after you pass away. "
                     "You should choose someone you trust to handle your affairs. "
                     "You may also consider choosing an alternate executor in case your first choice is unable to serve.", 
@@ -218,21 +237,26 @@ def will() -> rx.Component:
                         rx.input(
                             placeholder="Executor",
                             name="executor",
+                            align="center",
                         ),
                         rx.input(
                             placeholder="Alternate Executor",
                             name="alternate_executor",
+                            align="center",
                         ),
-                        rx.button("Submit", type="submit"),
+                        rx.button("Submit", type="submit", align="center"),
                     ),
                     on_submit=WillPageState.handle_submit_executor,
                     reset_on_submit=True,
+                    align="center",
                 ),
-                rx.text(WillPageState.get_display_executor, align="center"),
+                rx.text(WillPageState.get_executor, align="center"),
+                rx.text(WillPageState.get_alternate_executor, align="center"),
+                align="center",
             ),
 
 
-            rx.heading("Step 2: List your beneficiaries", font_size="1.5em"),
+            rx.heading("List your beneficiaries", font_size="1.5em"),
             rx.text("Your beneficiaries are the people who will receive your assets after you pass away. "
                     "In addition to people like your friends and family, you may also list charitable organizations as beneficiaries. "
                     "Your executor may be a beneficiary in your will but does not have to be a beneficiary."
@@ -252,7 +276,7 @@ def will() -> rx.Component:
             ),
             rx.text(WillPageState.get_beneficiaries, align="center"),
             
-            rx.heading("Step 3: List funeral arrangements", font_size="1.5em"),
+            rx.heading("List funeral arrangements", font_size="1.5em"),
             rx.text("You can list your intended funeral arrangements here. "
                     "You may also consider creating a separate document with your funeral arrangements and letting your executor know where to find it.", 
                     align="center"),
@@ -270,7 +294,7 @@ def will() -> rx.Component:
             ),
             rx.text(WillPageState.get_funeral_arrangements, align="center"),
 
-            rx.heading("Step 4: Distribute your assets", font_size="1.5em"),
+            rx.heading("Distribute your assets", font_size="1.5em"),
             rx.text("List your assets here. This is a list of things that you own that you want to be distributed to your beneficiaries. This can include money, property, pets, vehicles, and personal belongings or heirlooms. "
                     "You may also include things like online account passwords to be distributed as well. "
                     "Each asset must be distributed to a beneficiary. "
@@ -279,18 +303,29 @@ def will() -> rx.Component:
                     align="center"),
             
             # put in a form to list assets and assign each to a beneficiary
-            rx.form(
-                rx.input(
-                    placeholder="Asset",
-                    name="asset",
+            rx.vstack(
+                rx.form(
+                    rx.vstack(
+                    rx.input(
+                        placeholder="Asset",
+                        name="asset",
+                    ),
+                    rx.select(
+                        placeholder="Select Beneficiary",
+                        name="asset_beneficiary",
+                        label="Beneficiaries",
+                        items=WillPageState.get_beneficiaries_list,  # Populate options from existing beneficiaries
+                    ),
+                    rx.button("Add Asset", type="submit"),
+                    ),
+                    on_submit=WillPageState.add_asset,
+                    reset_on_submit=True,
                 ),
-                rx.button("Add Asset", type="submit"),
-                on_submit=WillPageState.add_asset,
-                reset_on_submit=True,
+                rx.text(WillPageState.get_assets, align="center", whitespace="pre-wrap"),
+                align="center",
             ),
-            rx.text(WillPageState.get_assets, align="center"),
             
-            rx.heading("Step 5: Create a residuary clause.", font_size="1.5em"),
+            rx.heading("Create a residuary clause.", font_size="1.5em"),
             rx.text("A residuary clause details what should happen to any assets that were not specifically listed in your will. "
                     "Even if you don't think there are any assets you haven't listed, it is still a good idea to choose a beneficiary for your residuary clause. ",
                     align="center"),
@@ -307,7 +342,7 @@ def will() -> rx.Component:
             ),
             rx.text(WillPageState.get_residuary_beneficiary, align="center"),
 
-            rx.heading("Step 6: Generate will template", font_size="1.5em"),
+            rx.heading("Generate will template", font_size="1.5em"),
             rx.text("Make sure you have chosen an executor, chosen at least one beneficiary, and listed at least one asset.",
                     align="center"),
 
@@ -323,7 +358,7 @@ def will() -> rx.Component:
             rx.cond(
                 WillPageState.can_do_holographic_will(),
                 rx.vstack(
-                    rx.heading("Step 7: Create a holographic will", font_size="1.5em"),
+                    rx.heading("Create a holographic will", font_size="1.5em"),
                     rx.spacer(),
                     rx.text("Your state recognizes holographic wills. You can create a holographic will by writing your will by hand and signing it. You do not need witnesses to sign your will. You should still consider consulting with a lawyer to ensure your will is written properly.", align="center"),
                     align="center"
