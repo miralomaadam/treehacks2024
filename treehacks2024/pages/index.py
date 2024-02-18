@@ -14,8 +14,9 @@ def index() -> rx.Component:
     """
     # with rx.chakra.theme_provider():  # Commented out for now
     top_image = rx.chakra.image(
-        src="/Logo 0 - Teal.png",  # Replace with the path to your image
+        src="/Logo 0 - Teal.png",
         width="100%",
+        height="80px",
         object_fit="cover"  # Optional, for how the image should fit into the container
     )
     sidebar = rx.chakra.box(
@@ -51,7 +52,7 @@ def index() -> rx.Component:
         width="80%",
     )
 
-    layout = rx.chakra.hstack(sidebar, main_content, direction="row", height="100vh", background_color="#dad6d2")
+    layout = rx.chakra.vstack(top_image, rx.chakra.hstack(sidebar, main_content, direction="row", height="100vh", background_color="#dad6d2"))
 
     return rx.fragment(
         layout,
