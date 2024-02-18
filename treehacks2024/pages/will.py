@@ -1,8 +1,10 @@
 import reflex as rx
+from sqlmodel import select
 
 from .login import require_login
 from treehacks2024.state import State
 from treehacks2024.will_state import WillState
+from treehacks2024.user import User
 
 import json
 
@@ -12,6 +14,7 @@ class WillPageState(rx.State):
     
     #TODO: load state from DB
 
+    
     _executor: str = ""
     _alternate_executor: str = ""
     _display_executor: str = ""
@@ -21,12 +24,45 @@ class WillPageState(rx.State):
     _residuary_beneficiary: str = ""
     _will_template: str = ""
 
+    @rx.var
+    def get_executor(self):
+        return self._executor
+    
+    @rx.var
+    def get_alternate_executor(self):
+        return self._alternate_executor
+    
+    @rx.var
+    def get_beneficiaries(self):
+        return self._beneficiaries
+    
+    @rx.var
+    def get_funeral_arrangements(self):
+        return self._funeral_arrangements
+    
+    @rx.var
+    def get_assets(self):
+        return self._assets
+
+    @rx.var
+    def get_residuary_beneficiary(self):
+        return self._residuary_beneficiary
+    
+    @rx.var
+    def get_will_template(self):
+        return self._will_template
+    
+    @rx.var
+    def get_display_executor(self):
+        return self._display_executor
+
     def can_do_holographic_will(self):
-        user = None
-        with rx.session() as session:
-            user = session.exec(
-                select(User).where(User.session_id == rx.get_state().session_id)
-            ).one_or_none()
+        # user = None
+        user = State.authenticated_user
+        # with rx.session() as session:
+        #     user = session.exec(
+        #         select(User).where(User.session_id == rx.get_state().session_id)
+        #     ).one_or_none()
         
         if user is None:
             return False
@@ -37,17 +73,36 @@ class WillPageState(rx.State):
         return False
     
     def save_changes(self):
+        #TODO: fix this
+        return
+
         user = None
         with rx.session() as session:
-            user = session.exec(
-                select(User).where(User.session_id == rx.get_state().session_id)
+            # user = session.exec(
+            #     select(User).where(User.session_id == rx.get_state().session_id)
+            # ).one_or_none()
+
+            user = State.authenticated_user
+
+            # print(user.username)
+
+            willstate = session.exec(
+                select(WillState).where(WillState.username == user.username)
             ).one_or_none()
-            user.executor = self._executor
-            user.alternate_executor = self._alternate_executor
-            user.beneficiaries = self._beneficiaries
-            user.funeral_arrangements = self._funeral_arrangements
-            user.assets = self._assets
-            user.residuary_beneficiary = self._residuary_beneficiary
+
+            if not willstate:
+                willstate = WillState() # if state doesn't yet exist
+                willstate.username = user.username
+
+            willstate.executor = self._executor
+            willstate.alternate_executor = self._alternate_executor
+            willstate.beneficiaries = self._beneficiaries
+            willstate.funeral_arrangements = self._funeral_arrangements
+            willstate.assets = self._assets
+            willstate.residuary_beneficiary = self._residuary_beneficiary
+
+            print("f")
+
             session.commit()
 
 
@@ -98,7 +153,7 @@ class WillPageState(rx.State):
 def will() -> rx.Component:
 
 
-    return rx.fragment(
+    content = rx.fragment(
         rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
         rx.vstack(
             rx.heading("Write Your Will", font_size="2em"),
@@ -129,7 +184,7 @@ def will() -> rx.Component:
                 ),
                 # this isn't working, unsure why
                 # https://reflex.dev/docs/library/forms/form/
-                rx.text(WillPageState._display_executor, align="center"),
+                rx.text(WillPageState.get_display_executor, align="center"),
             ),
 
 
@@ -152,7 +207,7 @@ def will() -> rx.Component:
                 on_submit=WillPageState.add_beneficiary,
                 reset_on_submit=True,
             ),
-            rx.text(WillPageState._beneficiaries, align="center"),
+            rx.text(WillPageState.get_beneficiaries, align="center"),
             
             rx.heading("Step 3: List funeral arrangements", font_size="1.5em"),
             # rx.spacer(),
@@ -192,7 +247,7 @@ def will() -> rx.Component:
                 on_submit=WillPageState.add_asset,
                 reset_on_submit=True,
             ),
-            rx.text(WillPageState._assets, align="center"),
+            rx.text(WillPageState.get_assets, align="center"),
             
             # rx.heading("Step 4.5: Choose your debts", font_size="1.5em"),
             # rx.spacer(),
@@ -220,7 +275,10 @@ def will() -> rx.Component:
 
             # add button to generate will template using previously specified info
             rx.button("Generate Example Will", type="button", on_click=WillPageState.generate_will),
-            rx.text(WillPageState._will_template),
+            rx.text(WillPageState.get_will_template),
+
+            rx.spacer(),
+            rx.button("Save Changes", type="button", on_click=WillPageState.save_changes),
 
             rx.spacer(),
             rx.cond(
@@ -239,3 +297,5 @@ def will() -> rx.Component:
             align="center",
         ),
     )
+
+    return content
