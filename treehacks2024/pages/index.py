@@ -38,19 +38,22 @@ def index() -> rx.Component:
 
     main_content = rx.chakra.box(
         #rx.chakra.heading("Welcome to AutonomyAid!", font_size="2em", color="#01353b"),
-        rx.chakra.text("This a site that helps senior citizens get the medical care they want and need. "
-            "Our company nameis AutonomyAid -- a union of two words at the center of our stated goal: "
-            "we want to aid seniors with maintaining and regaining their autonomy to live out the last stage "
-            "of their lives in the manner they best see fit. That autonomy encompasses making and communicating "
-            "decisions about health care decisions, about representation of their interest should they become "
-            "incapacitated, and about outlining the distribution of their assets. We are creating a Web-app "
-            "(as opposed to a mobile app) to increase accessibility for elderly people who have access to public "
-            "computers but may not have smart phones, or seniors who find smart phones incompatible with "
-            "degenerative vision problems or decline in dexterity due to arthritis in their hands.",
+        rx.chakra.text("In the journey of life, everyone deserves dignity, understanding, and autonomy, especially during the golden years. At AutonomyAid, we believe in empowering our elderly community with seamless, accessible healthcare solutions tailored for end-of-life care. Our web-based application is crafted with simplicity and ease of use in mind, making it perfect for those who may not have a smartphone but can access public computers. With AutonomyAid, you can confidently manage your healthcare decisions directly from your fingertips.",
             font_size="0.7em",
             #margin_top="0.5em",
             padding="1em",
             ),
+        rx.text.strong("Key Features: ",            
+            font_size="0.7em",
+            #margin_top="0.5em",
+            padding="1em",
+            ),
+        rx.unordered_list(
+            rx.list_item("Direct DNR Management: Securely set up appointments with healthcare providers to sign a Do Not Resuscitate (DNR) order. Your DNR will be automatically uploaded to your electronic health record, ensuring your wishes are respected without relying on intermediaries.", font_size="0.7em", left_padding="1em"),
+            rx.list_item("Intuitive Health Chatbot: Our friendly chatbot is here to listen to your health concerns. It gently guides you through questions about your ailments and suggests occupational therapy interventions to alleviate symptoms and improve your quality of life.", font_size="0.7em", left="1em"),
+            rx.list_item("Ethical Guidance for Tough Decisions: Life's hardest choices shouldn't be faced alone. Our platform provides clear, compassionate answers to complex medical ethics questions beyond DNR directives, like considerations for surgeries that could impact motor function or sensory abilities.", font_size="0.7em", left="1em"),
+        ),
+        
         #padding_top="0%",
         width="80%",
     )
