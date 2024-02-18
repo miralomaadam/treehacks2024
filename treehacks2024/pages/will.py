@@ -17,7 +17,7 @@ class WillPageState(rx.State):
     
     _executor: str = ""
     _alternate_executor: str = ""
-    _display_executor: str = ""
+    _display_executor: str = "Executor: , Alternate Executor: "
     _beneficiaries: str = ""
     _funeral_arrangements: str = ""
     _assets: str = ""
@@ -34,19 +34,25 @@ class WillPageState(rx.State):
     
     @rx.var
     def get_beneficiaries(self):
-        return self._beneficiaries
+        res = "Beneficiaries: "
+        if self._beneficiaries:
+            res += ", ".join(json.loads(self._beneficiaries))
+        return res
     
     @rx.var
     def get_funeral_arrangements(self):
-        return self._funeral_arrangements
+        return "Funeral Arrangements: " + self._funeral_arrangements
     
     @rx.var
     def get_assets(self):
-        return self._assets
+        res = "Assets: "
+        if self._assets:
+            res += ", ".join(json.loads(self._assets))
+        return res
 
     @rx.var
     def get_residuary_beneficiary(self):
-        return self._residuary_beneficiary
+        return "Residuary Beneficiary: " + self._residuary_beneficiary
     
     @rx.var
     def get_will_template(self):
@@ -56,6 +62,8 @@ class WillPageState(rx.State):
     def get_display_executor(self):
         return self._display_executor
 
+
+    # this doesn't work rn
     def can_do_holographic_will(self):
         # user = None
         user = State.authenticated_user
@@ -133,7 +141,7 @@ class WillPageState(rx.State):
         asset = form_data["asset"]
         if not asset:
             return
-        assets = json.loads(self._assets) if self._beneficiaries else []
+        assets = json.loads(self._assets) if self._assets else []
         assets.append(asset)
         self._assets = json.dumps(assets)
     
@@ -144,8 +152,48 @@ class WillPageState(rx.State):
         self._residuary_beneficiary = residuary_beneficiary
     
     def generate_will(self):
-        # TODO: make this look nice
-        self._will_template = self._executor + self._alternate_executor + self._beneficiaries + self._assets + self._residuary_beneficiary + self._funeral_arrangements
+        will_template = f"Last Will and Testament of _____________________\n\n"
+
+        # Step 1: Executor and Alternate Executor
+        will_template += f"I appoint {self._executor} as the Executor of my will. "
+        will_template += f"If {self._executor} is unable or unwilling to serve, I appoint {self._alternate_executor} as the Alternate Executor. \n\n"
+
+        # Step 2: List of Beneficiaries
+        beneficiaries_list = json.loads(self._beneficiaries) if self._beneficiaries else []
+        if beneficiaries_list:
+            will_template += "I bequeath the following to my beneficiaries:\n"
+            for beneficiary in beneficiaries_list:
+                will_template += f"- {beneficiary}\n"
+        else:
+            will_template += "I have no specific beneficiaries listed.\n"
+
+        will_template += "\n"
+
+        # Step 3: Funeral Arrangements
+        if self._funeral_arrangements:
+            will_template += f"I request the following funeral arrangements:\n{self._funeral_arrangements}\n\n"
+
+        # Step 4: Distribute Assets
+        assets_list = json.loads(self._assets) if self._assets else []
+        if assets_list:
+            will_template += "I distribute the following assets:\n"
+            for asset in assets_list:
+                will_template += f"- {asset}\n"
+        else:
+            will_template += "I have no specific assets listed for distribution.\n"
+
+        will_template += "\n"
+
+        # Step 5: Residuary Beneficiary
+        if self._residuary_beneficiary:
+            will_template += f"I appoint {self._residuary_beneficiary} as the Residuary Beneficiary to receive any remaining assets not specifically mentioned in this will.\n\n"
+
+        # Additional Information or Custom Sections can be added here
+
+        # Step 6: Closing Statement
+        will_template += "In witness whereof, I have executed this will on this day.\n\n"
+
+        self._will_template = will_template
 
 
 @rx.page(title="Write Will", image="/github.svg")
@@ -158,9 +206,7 @@ def will() -> rx.Component:
         rx.vstack(
             rx.heading("Write Your Will", font_size="2em"),
             rx.spacer(),
-            # rx.text(""),
             rx.heading("Step 1: Choose your executor", font_size="1.5em"),
-            # rx.spacer(),
             rx.text("Your executor is the person who will carry out your wishes after you pass away. "
                     "You should choose someone you trust to handle your affairs. "
                     "You may also consider choosing an alternate executor in case your first choice is unable to serve.", 
@@ -182,14 +228,11 @@ def will() -> rx.Component:
                     on_submit=WillPageState.handle_submit_executor,
                     reset_on_submit=True,
                 ),
-                # this isn't working, unsure why
-                # https://reflex.dev/docs/library/forms/form/
                 rx.text(WillPageState.get_display_executor, align="center"),
             ),
 
 
             rx.heading("Step 2: List your beneficiaries", font_size="1.5em"),
-            # rx.spacer(),
             rx.text("Your beneficiaries are the people who will receive your assets after you pass away. "
                     "In addition to people like your friends and family, you may also list charitable organizations as beneficiaries. "
                     "Your executor may be a beneficiary in your will but does not have to be a beneficiary."
@@ -210,7 +253,6 @@ def will() -> rx.Component:
             rx.text(WillPageState.get_beneficiaries, align="center"),
             
             rx.heading("Step 3: List funeral arrangements", font_size="1.5em"),
-            # rx.spacer(),
             rx.text("You can list your intended funeral arrangements here. "
                     "You may also consider creating a separate document with your funeral arrangements and letting your executor know where to find it.", 
                     align="center"),
@@ -226,10 +268,9 @@ def will() -> rx.Component:
                 on_submit=WillPageState.set_funeral_arrangements,
                 reset_on_submit=True,
             ),
-            rx.text(WillPageState._funeral_arrangements, align="center"),
+            rx.text(WillPageState.get_funeral_arrangements, align="center"),
 
             rx.heading("Step 4: Distribute your assets", font_size="1.5em"),
-            # rx.spacer(),
             rx.text("List your assets here. This is a list of things that you own that you want to be distributed to your beneficiaries. This can include money, property, pets, vehicles, and personal belongings or heirlooms. "
                     "You may also include things like online account passwords to be distributed as well. "
                     "Each asset must be distributed to a beneficiary. "
@@ -249,11 +290,7 @@ def will() -> rx.Component:
             ),
             rx.text(WillPageState.get_assets, align="center"),
             
-            # rx.heading("Step 4.5: Choose your debts", font_size="1.5em"),
-            # rx.spacer(),
-            # rx.text(""),
             rx.heading("Step 5: Create a residuary clause.", font_size="1.5em"),
-            # rx.spacer(),
             rx.text("A residuary clause details what should happen to any assets that were not specifically listed in your will. "
                     "Even if you don't think there are any assets you haven't listed, it is still a good idea to choose a beneficiary for your residuary clause. ",
                     align="center"),
@@ -268,6 +305,7 @@ def will() -> rx.Component:
                 on_submit=WillPageState.set_residuary_beneficiary,
                 reset_on_submit=True,
             ),
+            rx.text(WillPageState.get_residuary_beneficiary, align="center"),
 
             rx.heading("Step 6: Generate will template", font_size="1.5em"),
             rx.text("Make sure you have chosen an executor, chosen at least one beneficiary, and listed at least one asset.",
@@ -277,8 +315,9 @@ def will() -> rx.Component:
             rx.button("Generate Example Will", type="button", on_click=WillPageState.generate_will),
             rx.text(WillPageState.get_will_template),
 
-            rx.spacer(),
-            rx.button("Save Changes", type="button", on_click=WillPageState.save_changes),
+            # doesn't do anything rn
+            # rx.spacer(),
+            # rx.button("Save Changes", type="button", on_click=WillPageState.save_changes),
 
             rx.spacer(),
             rx.cond(
