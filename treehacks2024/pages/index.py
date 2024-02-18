@@ -15,7 +15,7 @@ def index() -> rx.Component:
     # with rx.chakra.theme_provider():  # Commented out for now
     sidebar = rx.chakra.box(
         rx.chakra.vstack(
-            rx.chakra.image(src="assets/LogoTeal.png", width="200px", height="200px", align="center"),
+            rx.chakra.image(src="/LogoTeal.png", width="200px", height="200px", align="center"),
             rx.chakra.divider(orientation="horizontal"),
             rx.chakra.box(rx.chakra.link("Schedule DNR Appointment", href="/schedule", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.4em", width="100%"), width="240px", height="80px", display="flex", justify_content="center", align_items="center"),
             rx.chakra.box(rx.chakra.link("Identify Preferred Medical Care", href="/dnr_eol", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.4em", width="100%"), width="240px", height="80px", display="flex", justify_content="center", align_items="center"),
