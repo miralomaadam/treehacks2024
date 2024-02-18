@@ -3,6 +3,8 @@ import reflex as rx
 from .login import require_login
 from ..state import State
 
+SIDEBAR_COLOR = "#FFFFFF" 
+
 @rx.page(route="/", title="Home", image="/github.svg")
 @require_login
 def index() -> rx.Component:
