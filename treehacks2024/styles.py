@@ -104,6 +104,9 @@ base_style = {
         "_hover": {
             "bg": accent_dark,
         },
+        "border_radius": "full",
+        "background": "#097a87",
+        "color": "white",
     },
     rx.chakra.Menu: {
         "bg": bg_dark_color,
@@ -140,22 +143,25 @@ base_style = {
     },
     ".almost_hidden": {
         "opacity": 0,
-    }
-}
+        "color": "#fff",
+    },
+    ".rt-SelectTrigger": {
+        "font-size": "40px",
+        "height": "100px",
+        "overflow": "visible",
+    },
+    ".rt-SelectTriggerInner": {
+        "overflow": "visible",
+    },
+    '.rt-Button': {
+        "border_radius": "full",
+        "background": "#097a87",
+        "color": "white",
 
-markdown_style = {
-    "code": lambda text: rx.chakra.code(text, color="#1F1944", bg="#EAE4FD"),
-    "a": lambda text, **props: rx.chakra.link(
-        text,
-        **props,
-        font_weight="bold",
-        color="#03030B",
-        text_decoration="underline",
-        text_decoration_color="#AD9BF8",
-        _hover={
-            "color": "#AD9BF8",
-            "text_decoration": "underline",
-            "text_decoration_color": "#03030B",
-        },
-    ),
+    },
+    "input": {
+        "font-size": "40px",
+        "height": "100px",
+        "line-height": "100px",
+    },
 }
