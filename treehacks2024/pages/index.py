@@ -6,6 +6,7 @@ import reflex as rx
 
 from .login import require_login
 from ..state import State
+from ..components import navbar
 
 
 @rx.page(route="/", title="Home", image="/github.svg")
@@ -17,12 +18,11 @@ def index() -> rx.Component:
         A reflex component.
     """
     return rx.fragment(
-        rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
         rx.vstack(
-            rx.heading("Welcome!", font_size="2em"),
-            rx.spacer(),
+            navbar("Welcome!", hide_home=True),
+            rx.container(style={"height": "1em"}),
             rx.link(rx.button("Schedule DNR appointment"), href="/schedule", high_contrast=True),
-            rx.link(rx.button("Answer Questions About Yoru Preferred Medical Care"), href="/dnr_eol", high_contrast=True),
+            rx.link(rx.button("Answer Questions About Your Preferred Medical Care"), href="/dnr_eol", high_contrast=True),
             rx.link(rx.button("View DNR"), href="/view_dnr", high_contrast=True),
             rx.link(rx.button("Find OT interventions"), href="/ot", high_contrast=True),
             rx.link(rx.button("Will"), href="/will", high_contrast=True),

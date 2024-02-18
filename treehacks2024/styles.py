@@ -92,6 +92,7 @@ overlapping_button_style = {
 base_style = {
     "font_size": "40px",
     rx.button: {"font_size": "40px", "padding": "50px 50px"},
+    rx.select: {"font_size": "40px", "padding": "50px 50px"},
     rx.chakra.Avatar: {
         "shadow": shadow,
         "color": text_light_color,

@@ -5,6 +5,7 @@ from .login import require_login
 from treehacks2024.state import State
 from treehacks2024.will_state import WillState
 from treehacks2024.user import User
+from ..components import navbar
 
 import json
 
@@ -218,13 +219,10 @@ class WillPageState(rx.State):
 @rx.page(title="Write Will", image="/github.svg")
 @require_login
 def will() -> rx.Component:
-
-
     content = rx.fragment(
-        rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
         rx.vstack(
-            rx.heading("Write Your Will", font_size="2em"),
-            rx.spacer(),
+            navbar("Write Your Will"),
+            rx.container(style={"height": "1em"}),
             rx.heading("Choose your executor", font_size="1.5em"),
             rx.text("Your executor is the person who will carry out your wishes after you pass away. "
                     "You should choose someone you trust to handle your affairs. "

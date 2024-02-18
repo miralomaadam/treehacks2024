@@ -1,6 +1,7 @@
 import reflex as rx
 
 from .login import require_login
+from ..components import navbar
 
 question_style = {
     "bg": "white",
@@ -20,12 +21,6 @@ def dnr_eol() -> rx.Component:
     def on_submit() -> rx.event.EventSpec:
         # save data to a database later
         return rx.redirect('/dnr_eol')
-
-    def question_input(label: str, id: str) -> rx.Component:
-        return rx.fragment(
-            rx.text(label, margin_top="2px", margin_bottom="2px"),
-            rx.input(id=id, placeholder="Type your answer here")
-        )
     
     def question_input(label: str, id: str) -> rx.Component:
         return rx.fragment(
@@ -69,19 +64,13 @@ def dnr_eol() -> rx.Component:
         style=question_style
     )
 
-    home_button = rx.button("Home", on_click=go_home)
-
     return rx.fragment(
-        rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
-        home_button,
-        rx.center(
             rx.vstack(
-                rx.heading("Questions & Answers About Preferred Medical Care", font_size="0.75em"),
+                navbar("Questions & Answers About Preferred Medical Care"),
+                rx.container(style={"height": "1em"}),
                 form,
                 spacing="4",
                 align="center",
-                style={"bg": "#ADD8E6", "overflow": "auto"}
+                #style={"bg": "#ADD8E6", "overflow": "auto"}
             ),
-            align_items="center"
-        )
     )

@@ -35,6 +35,10 @@ class State(rx.State):
     # Whether the modal is open.
     modal_open: bool = False
 
+    def schedule_appointment(self, form_data: dict[str, str]):
+        print(form_data)
+        rx.redirect("/")
+
     def reset_chat(self):
         self.chat = []
         self.processing = False
