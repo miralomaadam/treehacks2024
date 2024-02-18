@@ -293,8 +293,8 @@ class WillPageState(rx.State):
 def will() -> rx.Component:
     content = rx.fragment(
         rx.vstack(
-            navbar("Write Your Will"),
-            rx.container(style={"height": "1em"}),
+            # navbar("Write Your Will"),
+            # rx.container(style={"height": "1em"}),
             rx.heading("Choose your executor", font_size="1em"),
             rx.text("Your executor is the person who will carry out your wishes after you pass away. "
                     "You should choose someone you trust to handle your affairs. "
@@ -307,24 +307,27 @@ def will() -> rx.Component:
                         rx.input(
                             placeholder="Executor",
                             name="executor",
-                            align="center",
+                            # align="center",
                         ),
                         rx.input(
                             placeholder="Alternate Executor",
                             name="alternate_executor",
-                            align="center",
+                            # align="center",
                         ),
-                        rx.button("Submit", type="submit", align="center"),
+                        rx.button("Submit", type="submit", 
+                                #   align="center"
+                                  ),
                     ),
                     on_submit=WillPageState.handle_submit_executor,
                     reset_on_submit=True,
-                    align="center",
+                    # align="center",
                 ),
                 rx.text(WillPageState.get_executor, font_size=".8em"),
                 rx.text(WillPageState.get_alternate_executor, font_size=".8em"),
                 rx.button("Reset Executors", type="button", on_click=WillPageState.handle_reset_executors),
-                align="center",
+                # align="center",
             ),
+            rx.spacer(),
 
 
             rx.heading("List your beneficiaries", font_size="1em"),
@@ -356,8 +359,9 @@ def will() -> rx.Component:
                     reset_on_submit=True,
                 ),
                 rx.text(WillPageState.get_beneficiaries, font_size=".8em"),
-                align="center",
+                # align="center",
             ),
+            rx.spacer(),
             
             rx.heading("List funeral arrangements", font_size="1em"),
             rx.text("You can list your intended funeral arrangements here. "
@@ -376,6 +380,7 @@ def will() -> rx.Component:
                 reset_on_submit=True,
             ),
             rx.text(WillPageState.get_funeral_arrangements, font_size=".8em"),
+            rx.spacer(),
 
             rx.heading("Distribute your assets", font_size="1em"),
             rx.text("List your assets here. This is a list of things that you own that you want to be distributed to your beneficiaries. This can include money, property, pets, vehicles, and personal belongings or heirlooms. "
@@ -434,9 +439,12 @@ def will() -> rx.Component:
                     on_submit=WillPageState.reassign_asset,
                     reset_on_submit=True,
                 ),
-                rx.text(WillPageState.get_assets, align="center", whitespace="pre-wrap", font_size=".8em"),
-                align="center",
+                rx.text(WillPageState.get_assets, 
+                        # align="center", 
+                        whitespace="pre-wrap", font_size=".8em"),
+                # align="center",
             ),
+            rx.spacer(),
             
             rx.heading("Create a residuary clause.", font_size="1em"),
             rx.text("A residuary clause details what should happen to any assets that were not specifically listed in your will. "
@@ -454,6 +462,7 @@ def will() -> rx.Component:
                 reset_on_submit=True,
             ),
             rx.text(WillPageState.get_residuary_beneficiary, font_size=".8em"),
+            rx.spacer(),
 
             rx.heading("Generate will template", font_size="1em"),
             rx.text("Make sure you have chosen an executor, chosen at least one beneficiary, and listed at least one asset.",
@@ -479,12 +488,60 @@ def will() -> rx.Component:
             #         align="center"
             #     )
             # ),
-            spacing="8",
-            padding_top="10%",
-            padding_right="20%",
-            padding_left="20%",
-            align="center",
+            # spacing="8",
+            # padding_top="10%",
+            padding_right="10%",
+            # padding_left="20%",
+            # align="center",
         ),
     )
 
-    return content
+    top_image = rx.chakra.image(
+        src="/Banner SVG.svg",  # Replace with the path to your image
+        width="100%",
+        object_fit="cover"  # Optional, for how the image should fit into the container
+    )
+
+    sidebar = rx.chakra.box(
+        rx.chakra.vstack(
+            rx.chakra.box(
+                #rx.chakra.link("Return to Home", href="/", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"),
+                padding_bottom="1em",  # Add padding below the button if needed
+            ),
+            rx.chakra.divider(orientation="horizontal"),
+            # You can add more components here if needed
+        ),
+        width="10%",
+        padding="2.5%",
+        background_color="#FFFFFF",
+        display="flex",
+        flex_direction="column",
+        justify_content="flex-start",  # This aligns children to the start of the flex container
+    )
+
+    return rx.fragment(
+        rx.vstack(
+            top_image,  # This will place the image at the top of the page
+            rx.hstack(
+                rx.chakra.box(
+                    rx.chakra.link("Return to Home", href="/", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", 
+                                width="100%"),  # Adjust width here
+                    width="180%", height="80px", display="flex", justify_content="center", align_items="center",  # Adjust width here if needed
+                    padding="1em"
+                ),
+                rx.hstack(
+                    sidebar,  # The sidebar without the "Return to Home" button
+                    rx.vstack(
+                        rx.container(style={"height": "1em"}),
+                        content,
+                        spacing="4",
+                        align="center",
+                    ),
+                    spacing="4",
+                    align="start",
+                ),
+            ),
+            spacing="4",
+            align="start",
+        )
+    )
