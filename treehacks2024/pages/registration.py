@@ -30,7 +30,6 @@ class RegistrationState(State):
         Args:
             form_data: A dict of form fields and values.
         """
-        print(form_data)
         with rx.session() as session:
             if not self._state_name:
                 self.error_message = "State name cannot be empty"
