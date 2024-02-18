@@ -295,11 +295,11 @@ def will() -> rx.Component:
         rx.vstack(
             navbar("Write Your Will"),
             rx.container(style={"height": "1em"}),
-            rx.heading("Choose your executor", font_size="1.5em"),
+            rx.heading("Choose your executor", font_size="1em"),
             rx.text("Your executor is the person who will carry out your wishes after you pass away. "
                     "You should choose someone you trust to handle your affairs. "
                     "You may also consider choosing an alternate executor in case your first choice is unable to serve.", 
-                    align="center"),
+                    font_size=".8em"),
 
             rx.vstack(
                 rx.form(
@@ -320,47 +320,49 @@ def will() -> rx.Component:
                     reset_on_submit=True,
                     align="center",
                 ),
-                rx.text(WillPageState.get_executor, align="center"),
-                rx.text(WillPageState.get_alternate_executor, align="center"),
+                rx.text(WillPageState.get_executor, font_size=".8em"),
+                rx.text(WillPageState.get_alternate_executor, font_size=".8em"),
                 rx.button("Reset Executors", type="button", on_click=WillPageState.handle_reset_executors),
                 align="center",
             ),
 
 
-            rx.heading("List your beneficiaries", font_size="1.5em"),
+            rx.heading("List your beneficiaries", font_size="1em"),
             rx.text("Your beneficiaries are the people who will receive your assets after you pass away. "
                     "In addition to people like your friends and family, you may also list charitable organizations as beneficiaries. "
                     "Your executor may be a beneficiary in your will but does not have to be a beneficiary."
                     "You can also list beneficiaries that you do not assign assets to. "
                     "This may be because they are listed in your residuary clause. "
-                    "You might also do this because you do not want to give any assets to them: specifying that you do not wish to give someone any assets in your will can make it harder for them to contest it. " , 
-                    align="center"),
+                    "You might also do this because you do not want to give any assets to them; specifying that you do not wish to give someone any assets in your will can make it harder for them to contest it. " , 
+                    font_size=".8em"),
             
-            rx.form(
-                rx.input(
-                    placeholder="Beneficiary",
-                    name="beneficiary",
+            rx.vstack(
+                rx.form(
+                    rx.input(
+                        placeholder="Beneficiary",
+                        name="beneficiary",
+                    ),
+                    rx.button("Add Beneficiary", type="submit"),
+                    on_submit=WillPageState.add_beneficiary,
+                    reset_on_submit=True,
                 ),
-                rx.button("Add Beneficiary", type="submit"),
-                on_submit=WillPageState.add_beneficiary,
-                reset_on_submit=True,
-            ),
-            rx.form(
-                rx.input(
-                    placeholder="Beneficiary to Delete",
-                    name="beneficiary_to_delete",
+                rx.form(
+                    rx.input(
+                        placeholder="Beneficiary to Delete",
+                        name="beneficiary_to_delete",
+                    ),
+                    rx.button("Delete Beneficiary", type="submit"),
+                    on_submit=WillPageState.delete_beneficiary,
+                    reset_on_submit=True,
                 ),
-                rx.button("Delete Beneficiary", type="submit"),
-                on_submit=WillPageState.delete_beneficiary,
-                reset_on_submit=True,
+                rx.text(WillPageState.get_beneficiaries, font_size=".8em"),
+                align="center",
             ),
-            rx.text(WillPageState.get_beneficiaries, align="center"),
-
             
-            rx.heading("List funeral arrangements", font_size="1.5em"),
+            rx.heading("List funeral arrangements", font_size="1em"),
             rx.text("You can list your intended funeral arrangements here. "
                     "You may also consider creating a separate document with your funeral arrangements and letting your executor know where to find it.", 
-                    align="center"),
+                    font_size=".8em"),
             
             
             # funeral arrangements form
@@ -373,15 +375,15 @@ def will() -> rx.Component:
                 on_submit=WillPageState.set_funeral_arrangements,
                 reset_on_submit=True,
             ),
-            rx.text(WillPageState.get_funeral_arrangements, align="center"),
+            rx.text(WillPageState.get_funeral_arrangements, font_size=".8em"),
 
-            rx.heading("Distribute your assets", font_size="1.5em"),
+            rx.heading("Distribute your assets", font_size="1em"),
             rx.text("List your assets here. This is a list of things that you own that you want to be distributed to your beneficiaries. This can include money, property, pets, vehicles, and personal belongings or heirlooms. "
                     "You may also include things like online account passwords to be distributed as well. "
                     "Each asset must be distributed to a beneficiary. "
                     "Assets that cannot be distributed to your beneficiaries include things like life insurance benefits, retirement plans, assets owned under joint tenancy, and payable-on-death accounts and secutires. "
                     "The distribution of these assets must be done outside of your will: for example setting a beneficiary for your life insurane policy must be done under that policy.", 
-                    align="center"),
+                    font_size=".8em"),
             
             # put in a form to list assets and assign each to a beneficiary
             rx.vstack(
@@ -432,14 +434,14 @@ def will() -> rx.Component:
                     on_submit=WillPageState.reassign_asset,
                     reset_on_submit=True,
                 ),
-                rx.text(WillPageState.get_assets, align="center", whitespace="pre-wrap"),
+                rx.text(WillPageState.get_assets, align="center", whitespace="pre-wrap", font_size=".8em"),
                 align="center",
             ),
             
-            rx.heading("Create a residuary clause.", font_size="1.5em"),
+            rx.heading("Create a residuary clause.", font_size="1em"),
             rx.text("A residuary clause details what should happen to any assets that were not specifically listed in your will. "
                     "Even if you don't think there are any assets you haven't listed, it is still a good idea to choose a beneficiary for your residuary clause. ",
-                    align="center"),
+                    font_size=".8em"),
 
             # specify residuary beneficiary
             rx.form(
@@ -451,15 +453,15 @@ def will() -> rx.Component:
                 on_submit=WillPageState.set_residuary_beneficiary,
                 reset_on_submit=True,
             ),
-            rx.text(WillPageState.get_residuary_beneficiary, align="center"),
+            rx.text(WillPageState.get_residuary_beneficiary, font_size=".8em"),
 
-            rx.heading("Generate will template", font_size="1.5em"),
+            rx.heading("Generate will template", font_size="1em"),
             rx.text("Make sure you have chosen an executor, chosen at least one beneficiary, and listed at least one asset.",
-                    align="center"),
+                    font_size=".8em"),
 
             # add button to generate will template using previously specified info
             rx.button("Generate Example Will", type="button", on_click=WillPageState.generate_will),
-            rx.text(WillPageState.get_will_template),
+            rx.text(WillPageState.get_will_template, font_size=".8em"),
 
             # doesn't do anything rn
             # rx.spacer(),
@@ -479,8 +481,8 @@ def will() -> rx.Component:
             # ),
             spacing="8",
             padding_top="10%",
-            padding_right="10%",
-            padding_left="10%",
+            padding_right="20%",
+            padding_left="20%",
             align="center",
         ),
     )
