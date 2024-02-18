@@ -66,7 +66,8 @@ def action_bar() -> rx.Component:
                             id="question",
                             _placeholder={"color": "#fffa"},
                             _hover={"border_color": styles.accent_color},
-                            style=styles.input_style,
+                            #autofocus=True,
+                            is_disabled=State.processing,
                         ),
                         rx.chakra.button(
                             rx.cond(
@@ -76,7 +77,18 @@ def action_bar() -> rx.Component:
                             ),
                             type_="submit",
                             _hover={"bg": styles.accent_color},
-                            style=styles.input_style,
+                            is_disabled=State.processing,
+                        ),
+                        rx.chakra.button(
+                            rx.cond(
+                                State.processing,
+                                loading_icon(height="1em"),
+                                rx.chakra.text("Reset"),
+                            ),
+                            type_="reset",
+                            on_click=State.reset_chat,
+                            _hover={"bg": styles.accent_color},
+                            is_disabled=State.processing,
                         ),
                     ),
                     is_disabled=State.processing,

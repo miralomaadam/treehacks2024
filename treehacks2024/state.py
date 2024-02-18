@@ -36,8 +36,8 @@ class State(rx.State):
     modal_open: bool = False
 
     def reset_chat(self):
-        """Create a new chat."""
         self.chat = []
+        self.processing = False
 
     async def process_question(self, form_data: dict[str, str]):
         # Get the question from the form

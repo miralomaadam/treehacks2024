@@ -163,7 +163,7 @@ def require_login(page: rx.app.ComponentCallable) -> rx.app.ComponentCallable:
                 rx.center(
                     # When this spinner mounts, it will redirect to the login page
                     rx.chakra.spinner(on_mount=LoginState.redir),
-                    rx.chakra.text_area(on_focus=lambda _: LoginState.redir(), autofocus=True, class_name="almost_hidden")
+                    rx.chakra.button(on_focus=lambda: LoginState.redir(), autofocus=True, class_name="almost_hidden")
                 ),
             )
         )

@@ -30,12 +30,14 @@ shadow = "rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30
 
 message_style = dict(display="inline-block", p="4", border_radius="xl", max_w="30em")
 
+"""
 input_style = dict(
     bg=bg_medium_color,
     border_color=border_color,
     border_width="1px",
     p="4",
 )
+"""
 
 icon_style = dict(
     font_size="md",
@@ -75,7 +77,7 @@ link_style = {
 }
 
 button_style = {
-    "color": text_color,
+    #"color": text_color,
     "text_decoration": "none",
     "font-size": "25px",
     **hover_accent_color,
@@ -96,8 +98,8 @@ base_style = {
         "bg": border_color,
     },
     rx.chakra.Button: {
-        "shadow": shadow,
-        "color": text_light_color,
+        #"shadow": shadow,
+        #"color": text_light_color,
         "_hover": {
             "bg": accent_dark,
         },
