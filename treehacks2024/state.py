@@ -7,7 +7,49 @@ import reflex as rx
 
 from .auth_session import AuthSession
 from .user import User
+from llama_index import StorageContext, VectorStoreIndex, load_index_from_storage
+from llama_index.readers import PDFReader
+from llama_iris import IRISVectorStore
 
+import getpass
+import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
+if not os.environ.get("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
+
+username = 'SUPERUSER'
+password = 'SYS2' 
+hostname = 'localhost' 
+port = '1972' 
+namespace = 'USER'
+CONNECTION_STRING = f"iris://{username}:{password}@{hostname}:{port}/{namespace}"
+
+pdf_path = os.path.join("treehacks2024/data", "OTHandbook.pdf")
+
+ot_pdf = PDFReader().load_data(file=pdf_path)
+
+vector_store = IRISVectorStore.from_params(
+    connection_string=CONNECTION_STRING,
+    table_name="OT_handbook",
+    embed_dim=1536,  # openai embedding dimension
+)
+
+storage_context = StorageContext.from_defaults(vector_store=vector_store)
+# service_context = ServiceContext.from_defaults(
+#     embed_model=embed_model, llm=None
+# )
+
+index = VectorStoreIndex.from_documents(
+    ot_pdf, 
+    storage_context=storage_context, 
+    show_progress=True, 
+    # service_context=service_context,
+)
+
+query_engine = index.as_query_engine()
 
 AUTH_TOKEN_LOCAL_STORAGE_KEY = "_auth_tokens"
 DEFAULT_AUTH_SESSION_EXPIRATION_DELTA = datetime.timedelta(days=7)
@@ -19,10 +61,24 @@ class QA(rx.Base):
     question: str
     answer: str
 
+DEFAULT_CHATS = {
+    "Intros": [],
+}
 
 class State(rx.State):
     # The auth_token is stored in local storage to persist across tab and browser sessions.
     auth_token: str = rx.LocalStorage(name=AUTH_TOKEN_LOCAL_STORAGE_KEY)
+
+    chats: dict[str, list[QA]] = DEFAULT_CHATS
+
+    # The current chat name.
+    current_chat = "Intros"
+
+        # The name of the new chat.
+    new_chat_name: str = ""
+
+    # Whether the drawer is open.
+    drawer_open: bool = False
 
     # The current question.
     question: str
@@ -38,6 +94,14 @@ class State(rx.State):
     def reset_chat(self):
         self.chat = []
         self.processing = False
+
+    def ensure_current_chat_initialized(self):
+        """Ensure the current chat is initialized with at least one QA entry."""
+        if self.current_chat not in self.chats:
+            self.chats[self.current_chat] = []
+        if not self.chats[self.current_chat]:
+            # Append an empty QA object if the list is empty
+            self.chats[self.current_chat].append(QA(question="", answer=""))
 
     async def process_question(self, form_data: dict[str, str]):
         # Get the question from the form
@@ -75,6 +139,13 @@ class State(rx.State):
         # Remove the last mock answer.
         messages = messages[:-1]
 
+        user_messages = [msg for msg in messages if msg['role'] == 'user']
+        print(user_messages)
+
+        query_input = " ".join([msg["content"] for msg in user_messages])
+        query_result = query_engine.query(query_input)
+        print(query_result)
+        
         """
         # Start a new session to answer the question.
         session = openai.ChatCompletion.create(
@@ -82,18 +153,25 @@ class State(rx.State):
             messages=messages,
             stream=True,
         )
-
         # Stream the results, yielding after every word.
-        for item in session:
+        for item in query_result:
             if hasattr(item.choices[0].delta, "content"):
                 answer_text = item.choices[0].delta.content
                 self.chats[self.current_chat][-1].answer += answer_text
                 self.chats = self.chats
                 yield
+        """ 
+        self.ensure_current_chat_initialized()
+        for word in query_result.response:
+            # Construct the response incrementally. For example:
+            self.chats[self.current_chat][-1].answer += word 
+            self.chats = self.chats
+            print(self.chats)
+            yield
 
         # Toggle the processing flag.
         self.processing = False
-        """
+        
 
     @rx.cached_var
     def authenticated_user(self) -> User:
