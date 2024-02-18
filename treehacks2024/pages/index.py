@@ -15,7 +15,7 @@ def index() -> rx.Component:
     # with rx.chakra.theme_provider():  # Commented out for now
     top_image = rx.chakra.image(
         src="/Logo 0 - Teal.png", 
-        height="80px", 
+        height="30px", 
         width="100%",
         object_fit="cover"  
     )
