@@ -25,13 +25,14 @@ def index() -> rx.Component:
             rx.chakra.divider(orientation="horizontal"),
             rx.chakra.box(rx.chakra.link("Schedule DNR Appointment", href="/schedule", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"), width="280px", height="80px", display="flex", justify_content="center", align_items="center"),
             rx.chakra.box(rx.chakra.link("Preferred Medical Care", href="/dnr_eol", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"), width="280px", height="80px", display="flex", justify_content="center", align_items="center"),
-            rx.chakra.box(rx.chakra.link("View DNR", href="/view_dnr", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"), width="280px", height="80px", display="flex", justify_content="center", align_items="center"),
+            #rx.chakra.box(rx.chakra.link("View DNR", href="/view_dnr", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"), width="280px", height="80px", display="flex", justify_content="center", align_items="center"),
             rx.chakra.box(rx.chakra.link("Find OT Interventions", href="/ot", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"), width="280px", height="80px", display="flex", justify_content="center", align_items="center"),
             rx.chakra.box(rx.chakra.link("Will", href="/will", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"), width="280px", height="80px", display="flex", justify_content="center", align_items="center"),
+            rx.chakra.box(rx.chakra.link("Logout", on_click=State.do_logout, display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"), width="280px", height="80px", display="flex", justify_content="center", align_items="center"),
         ),
-        width="30%",
+        width="15%",
         padding="2.5%",
-        background_color="#FFFFFF" ,
+        background_color="#FFFFFF",
     )
 
     main_content = rx.chakra.box(

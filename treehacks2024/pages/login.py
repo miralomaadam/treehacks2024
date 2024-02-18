@@ -73,9 +73,7 @@ def login() -> rx.Component:
         rx.vstack(
             rx.form(
                 rx.fragment(
-                    rx.heading(
-                        "Login into your Account", size="7", margin_bottom="2rem"
-                    ),
+                    rx.heading("Login into your Account", style={"font-size": "40px", "line-height": "100px"}),
                     rx.text(
                         "Username",
                         color="hsl(240, 5%, 64.9%)",
@@ -83,7 +81,7 @@ def login() -> rx.Component:
                         margin_bottom="4px",
                     ),
                     rx.input(
-                        placeholder="username",
+                        placeholder="Enter username",
                         id="username",
                         border_color="hsl(240,3.7%,15.9%)",
                         justify_content="center",
@@ -95,7 +93,7 @@ def login() -> rx.Component:
                         margin_bottom="4px",
                     ),
                     rx.input(
-                        placeholder="password",
+                        placeholder="Enter password",
                         id="password",
                         border_color="hsl(240,3.7%,15.9%)",
                         justify_content="center",
@@ -115,8 +113,8 @@ def login() -> rx.Component:
             rx.link("Register", href=REGISTER_ROUTE),
             align_items="center"
         ),
-        padding="8rem 10rem",
-        margin_top="10vh",
+        padding="2rem 10rem 2rem 10rem",
+        justify_content="center",
         margin_x="auto",
         border="2px solid black",
         border_color="gray.300",

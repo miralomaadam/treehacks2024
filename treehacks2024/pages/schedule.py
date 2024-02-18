@@ -13,7 +13,7 @@ def schedule() -> rx.Component:
     return rx.fragment(
         rx.vstack(
             navbar("Schedule DNR Appointment"),
-            rx.spacer(),
+            rx.spacer(padding="3vw"),
             rx.form(
                 rx.vstack(
                     rx.hstack(
@@ -27,7 +27,7 @@ def schedule() -> rx.Component:
                         rx.select(items=[
                             "Katelynn Upham (0.6 miles)", "Anhthu Lewis (1.0 miles)", "Jaclyn Bilello (1.1 miles)", "Rekha Avirah (2.0 miles)",
                             # "Timothy Heja Tsung (0.1 miles)", "Leigh Ann Fraley (0.6 miles)", "Char Armitage (0.6 miles)", "Yesenia Perez (0.6 miles)", "Marissa G. Hall (0.6 miles)", "Drina Adams (1.2 miles)", "Katrina Sarkissian (5.6 miles)"
-                        ], placeholder="Select a GP", size="3"),
+                        ], placeholder="Select a GP", size="3", width="530px"),
                     ),
                     rx.hstack(
                         rx.text(
@@ -37,6 +37,7 @@ def schedule() -> rx.Component:
                             margin_bottom="4px",
                             style={"line-height": "100px"},
                         ),
+                        rx.spacer(padding="60px"),
                         rx.input(
                             placeholder="date",
                             id="date",
@@ -60,9 +61,13 @@ def schedule() -> rx.Component:
                         padding_top="14px",
                     ),
                     rx.spacer(),
-                    rx.button(
-                        "Schedule",
-                        type="submit",
+                    rx.center(
+                        rx.button(
+                            "Schedule",
+                            type="submit",
+                            #width="100%",
+                            justify="center",
+                        ),
                         width="100%",
                     ),
                 ),
@@ -72,7 +77,7 @@ def schedule() -> rx.Component:
             rx.spacer(),
             rx.divider(),
             rx.spacer(),
-            rx.text("Please download and print out the DNR form before your appointment.", color="hsl(240, 5%, 30%)"),
+            rx.text("Please download and print out the DNR form before your appointment.", color="hsl(240, 5%, 30%)", padding="20px"),
             rx.button(
                 "Download Form",
                 on_click=rx.download(url="/POLSTForm.2017rv2.pdf"),

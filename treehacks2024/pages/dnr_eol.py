@@ -89,29 +89,11 @@ def dnr_eol() -> rx.Component:
 
     return rx.fragment(
     rx.vstack(
-        top_image,  # This will place the image at the top of the page
-        rx.hstack(
-            rx.chakra.box(
-                rx.chakra.link("Return to Home", href="/", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", 
-                               width="100%"),  # Adjust width here
-                width="60%", height="80px", display="flex", justify_content="center", align_items="center",  # Adjust width here if needed
-                padding="1em"
-            ),
-            rx.hstack(
-                sidebar,  # The sidebar without the "Return to Home" button
-                rx.vstack(
-                    #navbar("Questions & Answers About Preferred Medical Care"),
-                    rx.container(style={"height": "1em"}),
-                    form,
-                    spacing="4",
-                    align="center",
-                ),
-                spacing="4",
-                align="start",
-            ),
-        ),
+        navbar('Preferred Medical Care'),  # This will place the image at the top of the page
+        rx.spacer(padding="3em"),
+        form,
         spacing="4",
-        align="start",
+        align="center",
     )
 )
 

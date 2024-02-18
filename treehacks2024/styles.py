@@ -144,6 +144,7 @@ base_style = {
     ".almost_hidden": {
         "opacity": 0,
         "color": "#fff",
+        "background": "#fff",
     },
     ".rt-SelectTrigger": {
         "font-size": "40px",

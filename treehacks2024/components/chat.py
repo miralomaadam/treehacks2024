@@ -62,7 +62,7 @@ def action_bar() -> rx.Component:
                 rx.chakra.form_control(
                     rx.chakra.hstack(
                         rx.chakra.input(
-                            placeholder="Type something...",
+                            placeholder="Ask a question...",
                             id="question",
                             _placeholder={"color": "#fffa"},
                             _hover={"border_color": styles.accent_color},

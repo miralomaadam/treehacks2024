@@ -10,9 +10,14 @@ def ot() -> rx.Component:
     return rx.fragment(
         rx.vstack(
             navbar("Find OT Interventions"),
-            rx.container(style={"height": "1em"}),
+            rx.spacer(padding="2em"),
+            rx.vstack(
             chat(),
             action_bar(),
+            border_radius="10px",
+            border="2px solid lightgrey",
+            padding="0 10px 0 10px",
+            ),
             spacing="4",
             padding_top="10%",
             align="center",
