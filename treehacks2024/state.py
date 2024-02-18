@@ -4,7 +4,7 @@ import os
 from sqlmodel import select
 
 import reflex as rx
-
+import openai 
 from .auth_session import AuthSession
 from .user import User
 
@@ -19,6 +19,9 @@ class QA(rx.Base):
     question: str
     answer: str
 
+DEFAULT_CHATS = {
+    "Intros": [],
+}
 
 class State(rx.State):
     # The auth_token is stored in local storage to persist across tab and browser sessions.
@@ -27,7 +30,9 @@ class State(rx.State):
     # The current question.
     question: str
 
-    chat: list[QA]
+    chats: dict[str, list[QA]] = DEFAULT_CHATS
+
+    current_chat = "Intros"
 
     # Whether we are processing the question.
     processing: bool = False
@@ -60,9 +65,10 @@ class State(rx.State):
         Args:
             form_data: A dict with the current question.
         """
+
         # Add the question to the list of questions.
         qa = QA(question=question, answer="")
-        self.chat.append(qa)
+        self.chats[self.current_chat].append(qa)
 
         # Clear the input and start the processing.
         self.processing = True
@@ -72,16 +78,15 @@ class State(rx.State):
         messages = [
             {"role": "system", "content": "You are a friendly chatbot named Reflex."}
         ]
-        for qa in self.chat:
+        for qa in self.chats[self.current_chat]:
             messages.append({"role": "user", "content": qa.question})
             messages.append({"role": "assistant", "content": qa.answer})
 
         # Remove the last mock answer.
         messages = messages[:-1]
 
-        """
         # Start a new session to answer the question.
-        session = openai.ChatCompletion.create(
+        session = openai.chat.completions.create(
             model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
             messages=messages,
             stream=True,
@@ -91,13 +96,15 @@ class State(rx.State):
         for item in session:
             if hasattr(item.choices[0].delta, "content"):
                 answer_text = item.choices[0].delta.content
+                if answer_text is None:
+                    answer_text = ""  # Or some default text like "No answer available."
                 self.chats[self.current_chat][-1].answer += answer_text
                 self.chats = self.chats
                 yield
 
         # Toggle the processing flag.
         self.processing = False
-        """
+
 
     @rx.cached_var
     def authenticated_user(self) -> User:
