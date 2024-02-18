@@ -13,9 +13,16 @@ def index() -> rx.Component:
         A reflex component.
     """
     # with rx.chakra.theme_provider():  # Commented out for now
+    top_image = rx.chakra.image(
+        src="/Logo 0 - Teal.png", 
+        height="80px", 
+        width="100%",
+        object_fit="cover"  
+    )
+
     sidebar = rx.chakra.box(
         rx.chakra.vstack(
-            rx.chakra.image(src="/Logo 0 - Teal.png", width="200px", height="200px", align="center"),
+            rx.chakra.image(src="/Logo 0 - Teal.png", width="220px", height="220px", align="center"),
             rx.chakra.divider(orientation="horizontal"),
             rx.chakra.box(rx.chakra.link("Schedule DNR Appointment", href="/schedule", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.4em", width="100%"), width="240px", height="80px", display="flex", justify_content="center", align_items="center"),
             rx.chakra.box(rx.chakra.link("Identify Preferred Medical Care", href="/dnr_eol", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.4em", width="100%"), width="240px", height="80px", display="flex", justify_content="center", align_items="center"),
@@ -46,7 +53,7 @@ def index() -> rx.Component:
         width="80%",
     )
 
-    layout = rx.chakra.hstack(sidebar, main_content, direction="row", height="100vh", background_color="#dad6d2")
+    layout = (rx.chakra.vstack( top_image, rx.chakra.hstack(sidebar, main_content, direction="row", height="100vh", background_color="#dad6d2")))
 
     return rx.fragment(
         layout,
