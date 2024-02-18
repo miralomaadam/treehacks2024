@@ -2,6 +2,7 @@ from treehacks2024 import styles
 import reflex as rx
 from .login import require_login
 from ..state import State
+from ..components import navbar
 
 
 @rx.page(route="/", title="Home", image="/github.svg")
