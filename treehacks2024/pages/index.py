@@ -1,12 +1,7 @@
-"""The home page of the app."""
-
 from treehacks2024 import styles
-
 import reflex as rx
-
 from .login import require_login
 from ..state import State
-
 
 @rx.page(route="/", title="Home", image="/github.svg")
 @require_login
@@ -16,19 +11,30 @@ def index() -> rx.Component:
     Returns:
         A reflex component.
     """
-    return rx.fragment(
-        rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
-        rx.vstack(
-            rx.heading("Welcome!", font_size="2em"),
-            rx.spacer(),
-            rx.link(rx.button("Schedule DNR appointment"), href="/schedule", high_contrast=True),
-            rx.link(rx.button("Answer Questions About Yoru Preferred Medical Care"), href="/dnr_eol", high_contrast=True),
-            rx.link(rx.button("View DNR"), href="/view_dnr", high_contrast=True),
-            rx.link(rx.button("Find OT interventions"), href="/ot", high_contrast=True),
-            rx.link(rx.button("Will"), href="/will", high_contrast=True),
-            rx.button("Logout", on_click=State.do_logout, float="right", size="4", high_contrast=True),
-            spacing="4",
-            padding_top="10%",
-            align="center",
+    # with rx.chakra.theme_provider():  # Commented out for now
+    sidebar = rx.chakra.box(
+        rx.chakra.vstack(
+            rx.chakra.divider(orientation="horizontal"),
+            rx.chakra.link("Schedule DNR Appointment", href="/schedule"),
+            rx.chakra.link("Answer Questions About Preferred Medical Care", href="/dnr_eol"),
+            rx.chakra.link("View DNR", href="/view_dnr"),
+            rx.chakra.link("Find OT Interventions", href="/ot"),
+            rx.chakra.link("Will", href="/will"),
         ),
+        width="20%",
+        padding="5%",
+        background_color=styles.SIDEBAR_COLOR,
+    )
+
+    main_content = rx.chakra.box(
+        rx.chakra.heading("Welcome!", font_size="2em"),
+        padding_top="10%",
+        width="80%",
+    )
+
+    layout = rx.chakra.hstack(sidebar, main_content, direction="row", height="100vh")
+
+    return rx.fragment(
+        layout,
+        rx.chakra.color_mode_button(rx.chakra.color_mode_icon(), float="right"),
     )
