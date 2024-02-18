@@ -7,3 +7,4 @@ from .schedule import schedule
 from .ot import ot
 from .view_dnr import view_dnr
 from .will import will
+from .medical import medical
