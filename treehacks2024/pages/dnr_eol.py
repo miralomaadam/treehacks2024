@@ -7,7 +7,7 @@ question_style = {
     "bg": "white",
     "padding": "2em",
     "border_radius": "100px",
-    "width": "60%",
+    "width": "90%",
     "align_items": "start",
 }
 
@@ -15,6 +15,12 @@ question_style = {
 @require_login
 def dnr_eol() -> rx.Component:
 
+    top_image = rx.chakra.image(
+        src="/Banner SVG.svg",  # Replace with the path to your image
+        width="100%",
+        object_fit="cover"  # Optional, for how the image should fit into the container
+    )
+    
     def go_home() -> rx.event.EventSpec:
         return rx.redirect('/')
 
@@ -29,6 +35,23 @@ def dnr_eol() -> rx.Component:
             style=question_style
         )
 
+    sidebar = rx.chakra.box(
+    rx.chakra.vstack(
+        rx.chakra.box(
+            #rx.chakra.link("Return to Home", href="/", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", width="100%"),
+            padding_bottom="1em",  # Add padding below the button if needed
+        ),
+        rx.chakra.divider(orientation="horizontal"),
+        # You can add more components here if needed
+    ),
+    width="10%",
+    padding="2.5%",
+    background_color="#FFFFFF",
+    display="flex",
+    flex_direction="column",
+    justify_content="flex-start",  # This aligns children to the start of the flex container
+)
+    
     questions = [
         "Can you describe your understanding of your current health condition and how it might change in the future?",
         "How do you view the progression of your illness or condition?",
@@ -65,12 +88,31 @@ def dnr_eol() -> rx.Component:
     )
 
     return rx.fragment(
-            rx.vstack(
-                navbar("Questions & Answers About Preferred Medical Care"),
-                rx.container(style={"height": "1em"}),
-                form,
-                spacing="4",
-                align="center",
-                #style={"bg": "#ADD8E6", "overflow": "auto"}
+    rx.vstack(
+        top_image,  # This will place the image at the top of the page
+        rx.hstack(
+            rx.chakra.box(
+                rx.chakra.link("Return to Home", href="/", display="block", text_align="center", padding="0.5em", border_radius="full", background="#097a87", color="white", font_size="0.5em", 
+                               width="100%"),  # Adjust width here
+                width="60%", height="80px", display="flex", justify_content="center", align_items="center",  # Adjust width here if needed
+                padding="1em"
             ),
+            rx.hstack(
+                sidebar,  # The sidebar without the "Return to Home" button
+                rx.vstack(
+                    #navbar("Questions & Answers About Preferred Medical Care"),
+                    rx.container(style={"height": "1em"}),
+                    form,
+                    spacing="4",
+                    align="center",
+                ),
+                spacing="4",
+                align="start",
+            ),
+        ),
+        spacing="4",
+        align="start",
     )
+)
+
+
