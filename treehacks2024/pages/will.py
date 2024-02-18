@@ -130,20 +130,45 @@ class WillPageState(rx.State):
     def handle_submit_executor(self, form_data: dict):
         executor = form_data["executor"]
         alternate_executor = form_data["alternate_executor"]
+        # Check if the new executor is the same as either the existing executor or alternate executor
+        if executor == alternate_executor:
+            alternate_executor = None
+        # Check if the new alternate executor is the same as the existing executor
         if executor:
             self._executor = executor
-        if alternate_executor:
+            if self._executor == self._alternate_executor:
+                self._alternate_executor = ""
+        if alternate_executor and alternate_executor != self._executor:
             self._alternate_executor = alternate_executor
         self._display_executor = f"Executor: {self._executor}, Alternate Executor: {self._alternate_executor}"
 
+    def handle_reset_executors(self):
+        self._executor = ""
+        self._alternate_executor = ""
+        self._display_executor = "Executor: , Alternate Executor: "
+
     def add_beneficiary(self, form_data: dict):
-        # TODO: expand this to collect more information: residence, contanct info of beneficiary, maybe last 4 of SSN #
+        # maybe expand this to collect more information: residence, contanct info of beneficiary, maybe last 4 of SSN #
         beneficiary = form_data["beneficiary"]
-        if not beneficiary:
+        
+        if not beneficiary or (self._beneficiaries != "" and beneficiary in json.loads(self._beneficiaries)):
             return
+
         beneficiaries = json.loads(self._beneficiaries) if self._beneficiaries else []
         beneficiaries.append(beneficiary)
         self._beneficiaries = json.dumps(beneficiaries)
+
+    def delete_beneficiary(self, form_data: dict):
+        beneficiary_to_delete = form_data.get("beneficiary_to_delete", "")
+
+        if not beneficiary_to_delete:
+            return
+
+        # Remove the beneficiary from the list
+        beneficiaries_list = json.loads(self._beneficiaries) if self._beneficiaries else []
+        beneficiaries_list = [beneficiary for beneficiary in beneficiaries_list if beneficiary != beneficiary_to_delete]
+        self._beneficiaries = json.dumps(beneficiaries_list)
+
 
     def set_funeral_arrangements(self, form_data: dict):
         funeral_arrangements = form_data["funeral_arrangements"]
@@ -152,39 +177,84 @@ class WillPageState(rx.State):
         self._funeral_arrangements = funeral_arrangements
 
     def add_asset(self, form_data: dict):
-        asset_name = form_data["asset"]
-        asset_beneficiary = form_data["asset_beneficiary"]
+        asset = form_data["asset"]
+        beneficiary = form_data["asset_beneficiary"]
+        
+        if not asset or not beneficiary:
+            return
+        
+        assets = json.loads(self._assets) if self._assets else []
 
-        if not asset_name or not asset_beneficiary:
+        # Check if the asset/beneficiary pair already exists
+        if any(entry.get("name") == asset and entry.get("beneficiary") == beneficiary for entry in assets):
             return
 
-        assets = json.loads(self._assets) if self._assets else []
-        assets.append({"name": asset_name, "beneficiary": asset_beneficiary})
+        assets.append({"name": asset, "beneficiary": beneficiary})
         self._assets = json.dumps(assets)
+
+    def delete_asset(self, form_data: dict):
+        asset_name_to_delete = form_data.get("asset_to_delete", "")
+        beneficiary_to_delete = form_data.get("beneficiary_to_delete", "")
+
+        if not asset_name_to_delete or not beneficiary_to_delete:
+            return
+        
+        assets_list = json.loads(self._assets) if self._assets else []
+
+        # Filter out the asset to delete based on both asset name and beneficiary
+        assets_list = [asset for asset in assets_list if asset.get("name") != asset_name_to_delete or asset.get("beneficiary") != beneficiary_to_delete]
+
+        # Update the assets attribute
+        self._assets = json.dumps(assets_list)
     
+    def reassign_asset(self, form_data: dict):
+        asset_to_reassign = form_data.get("asset_to_reassign", "")
+        old_beneficiary = form_data.get("old_beneficiary", "")
+        new_beneficiary = form_data.get("new_beneficiary", "")
+
+        if not asset_to_reassign or not old_beneficiary or not new_beneficiary:
+            return
+
+        assets_list = json.loads(self._assets) if self._assets else []
+
+        # Find the asset to reassign and update its beneficiary
+        for asset in assets_list:
+            if asset.get("name") == asset_to_reassign and asset.get("beneficiary") == old_beneficiary:
+                asset["beneficiary"] = new_beneficiary
+                break  # Assuming each asset has a unique tuple, exit the loop once the asset is found
+
+        # Update the assets attribute
+        self._assets = json.dumps(assets_list)
+
     def set_residuary_beneficiary(self, form_data: dict):
         residuary_beneficiary = form_data["residuary_beneficiary"]
         if not residuary_beneficiary:
             return
         self._residuary_beneficiary = residuary_beneficiary
-    
+
     def generate_will(self):
-        will_template = f"Last Will and Testament of _____________________\n\n"
+        will_template = f"Last Will and Testament of _____________________. "
 
         # Step 1: Executor and Alternate Executor
-        will_template += f"I appoint {self._executor} as the Executor of my will. "
-        will_template += f"If {self._executor} is unable or unwilling to serve, I appoint {self._alternate_executor} as the Alternate Executor. \n\n"
+        if self._executor:
+            will_template += f"I appoint {self._executor} as the Executor of my will. "
+        else:
+            will_template += "I have not appointed an Executor. "
+        if self._alternate_executor:
+            will_template += f"If {self._executor} is unable or unwilling to serve, I appoint {self._alternate_executor} as the Alternate Executor. "
 
         # Step 2: List of Beneficiaries
         beneficiaries_list = json.loads(self._beneficiaries) if self._beneficiaries else []
         if beneficiaries_list:
-            will_template += "I bequeath the following to my beneficiaries:\n"
+            will_template += "I bequeath the following to my beneficiaries:"
+            acc = ""
             for beneficiary in beneficiaries_list:
-                will_template += f"- {beneficiary}\n"
+                acc += f", {beneficiary}"
+            will_template += acc[1:]
         else:
-            will_template += "I have no specific beneficiaries listed.\n"
+            will_template += "I have no specific beneficiaries listed. "
 
-        will_template += "\n"
+        # will_template += "\n"
 
         # Step 3: Funeral Arrangements
         if self._funeral_arrangements:
@@ -193,24 +263,26 @@ class WillPageState(rx.State):
         # Step 4: Distribute Assets
         assets_list = json.loads(self._assets) if self._assets else []
         if assets_list:
-            will_template += "I distribute the following assets:\n"
+            will_template += "I distribute the following assets:"
+            acc = ""
             for asset_info in assets_list:
                 asset_name = asset_info.get("name", "")
                 asset_beneficiary = asset_info.get("beneficiary", "")
-                will_template += f"- {asset_name} to {asset_beneficiary}\n"
+                acc += f", {asset_name} to {asset_beneficiary}"
+            will_template += acc[1:]
         else:
-            will_template += "I have no specific assets listed for distribution.\n"
+            will_template += "I have no specific assets listed for distribution. "
 
-        will_template += "\n"
+        # will_template += "\n"
 
         # Step 5: Residuary Beneficiary
         if self._residuary_beneficiary:
-            will_template += f"I appoint {self._residuary_beneficiary} as the Residuary Beneficiary to receive any remaining assets not specifically mentioned in this will.\n\n"
+            will_template += f"I appoint {self._residuary_beneficiary} as the Residuary Beneficiary to receive any remaining assets not specifically mentioned in this will."
 
         # Additional Information or Custom Sections can be added here
 
         # Step 6: Closing Statement
-        will_template += "In witness whereof, I have executed this will on this day.\n\n"
+        will_template += "In witness whereof, I have executed this will on this day."
 
         self._will_template = will_template
 
@@ -250,6 +322,7 @@ def will() -> rx.Component:
                 ),
                 rx.text(WillPageState.get_executor, align="center"),
                 rx.text(WillPageState.get_alternate_executor, align="center"),
+                rx.button("Reset Executors", type="button", on_click=WillPageState.handle_reset_executors),
                 align="center",
             ),
 
@@ -272,7 +345,17 @@ def will() -> rx.Component:
                 on_submit=WillPageState.add_beneficiary,
                 reset_on_submit=True,
             ),
+            rx.form(
+                rx.input(
+                    placeholder="Beneficiary to Delete",
+                    name="beneficiary_to_delete",
+                ),
+                rx.button("Delete Beneficiary", type="submit"),
+                on_submit=WillPageState.delete_beneficiary,
+                reset_on_submit=True,
+            ),
             rx.text(WillPageState.get_beneficiaries, align="center"),
+
             
             rx.heading("List funeral arrangements", font_size="1.5em"),
             rx.text("You can list your intended funeral arrangements here. "
@@ -319,6 +402,36 @@ def will() -> rx.Component:
                     on_submit=WillPageState.add_asset,
                     reset_on_submit=True,
                 ),
+                rx.form(
+                    rx.input(
+                        placeholder="Asset Name to Delete",
+                        name="asset_to_delete",
+                    ),
+                    rx.input(
+                        placeholder="Beneficiary to Delete",
+                        name="beneficiary_to_delete",
+                    ),
+                    rx.button("Delete Asset", type="submit"),
+                    on_submit=WillPageState.delete_asset,
+                    reset_on_submit=True,
+                ),
+                rx.form(
+                    rx.input(
+                        placeholder="Asset Name to Reassign",
+                        name="asset_to_reassign",
+                    ),
+                    rx.input(
+                        placeholder="Old Beneficiary",
+                        name="old_beneficiary",
+                    ),
+                    rx.input(
+                        placeholder="New Beneficiary",
+                        name="new_beneficiary",
+                    ),
+                    rx.button("Reassign Asset", type="submit"),
+                    on_submit=WillPageState.reassign_asset,
+                    reset_on_submit=True,
+                ),
                 rx.text(WillPageState.get_assets, align="center", whitespace="pre-wrap"),
                 align="center",
             ),
@@ -352,16 +465,18 @@ def will() -> rx.Component:
             # rx.spacer(),
             # rx.button("Save Changes", type="button", on_click=WillPageState.save_changes),
 
-            rx.spacer(),
-            rx.cond(
-                WillPageState.can_do_holographic_will(),
-                rx.vstack(
-                    rx.heading("Create a holographic will", font_size="1.5em"),
-                    rx.spacer(),
-                    rx.text("Your state recognizes holographic wills. You can create a holographic will by writing your will by hand and signing it. You do not need witnesses to sign your will. You should still consider consulting with a lawyer to ensure your will is written properly.", align="center"),
-                    align="center"
-                )
-            ),
+            # can_do_holographic_will() doesn't work properly
+            # also probably a bad idea to tell elderly people to DIY it
+            # rx.spacer(),
+            # rx.cond(
+            #     WillPageState.can_do_holographic_will(),
+            #     rx.vstack(
+            #         rx.heading("Create a holographic will", font_size="1.5em"),
+            #         rx.spacer(),
+            #         rx.text("Your state recognizes holographic wills. You can create a holographic will by writing your will by hand and signing it. You do not need witnesses to sign your will. You should still consider consulting with a lawyer to ensure your will is written properly.", align="center"),
+            #         align="center"
+            #     )
+            # ),
             spacing="8",
             padding_top="10%",
             padding_right="10%",
